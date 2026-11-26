@@ -81,6 +81,7 @@
   </nav>
 
   <main id="main">
+<form id="asesmenForm" novalidate>
     <!-- 1 -->
     <section class="card" data-section="identitas" role="tabpanel" tabindex="0">
       <h2>1. Identitas &amp; Konteks Kunjungan</h2>
@@ -99,7 +100,7 @@
     </section>
 
     <!-- 2 -->
-    <section class="card" data-section="asesmen" role="tabpanel" tabindex="0" hidden>
+    <section class="card" data-section="asesmen" role="tabpanel" tabindex="0">
       <h2>2. Asesmen Awal</h2>
       <p class="desc">Pilih jenis asesmen. Field bersama muncul sekali; field khusus muncul sesuai jenis. Boleh lebih dari satu entri saat mutasi.</p>
       <form id="asesmenForm">
@@ -138,19 +139,18 @@
     </section>
 
     <!-- 3 -->
-    <section class="card" data-section="skrining" role="tabpanel" tabindex="0" hidden>
-      <h2>3. Skrining Terstandar</h2>
-      <p class="desc">Diisi sekali di awal. Di bagian observasi nilai ini tampil read-only agar tidak diinput ulang.</p>
-      <div class="grid">
-        <div><label for="skNyeri">Skrining nyeri</label><select id="skNyeri"><option>Tidak nyeri</option><option>Nyeri ringan</option><option>Nyeri sedang</option><option>Nyeri berat</option></select></div>
-        <div><label for="skJatuh">Skrining jatuh (Morse)</label><input id="skJatuh" class="num" inputmode="numeric" placeholder="Skor"></div>
-        <div><label for="skGizi">Skrining gizi (MST)</label><input id="skGizi" class="num" inputmode="numeric" placeholder="Skor"></div>
-        <div><label for="ewsAwal">CEWS awal (PEWS/NEWS/MEOWS)</label><input id="ewsAwal" class="num" inputmode="numeric" placeholder="Skor"></div>
+    <section class="card" data-section="skrining" role="tabpanel" tabindex="0">
+      <h2>3. Skrining Terstandar (bisa lebih dari satu baris)</h2>
+      <p class="desc">Diisi sekali di awal; di bagian observasi nilai ini tampil read-only agar tidak diinput ulang. Gunakan "+ Tambah baris skrining" bila ada skrining berulang.</p>
+      <div class="dyn-container">
+        <table><thead><tr><th>Skrining nyeri</th><th>Skor jatuh (Morse)</th><th>Skor gizi (MST)</th><th>CEWS awal</th><th></th></tr></thead>
+          <tbody id="skrRows"></tbody></table>
+        <div class="actions" style="justify-content:flex-start;margin-top:8px"><button class="btn" type="button" id="addSkr">+ Tambah baris skrining</button></div>
       </div>
     </section>
 
     <!-- 4 -->
-    <section class="card" data-section="observasi" role="tabpanel" tabindex="0" hidden>
+    <section class="card" data-section="observasi" role="tabpanel" tabindex="0">
       <h2>4. Observasi &amp; Pengukuran Berulang</h2>
       <p class="desc">EWS, Jatuh, dan Nyeri. Setiap simpan membuat entri baru lengkap dengan waktu, unit, petugas, dan status.</p>
       <div class="grid">
@@ -174,7 +174,7 @@
     </section>
 
     <!-- 5 -->
-    <section class="card" data-section="diagnosis" role="tabpanel" tabindex="0" hidden>
+    <section class="card" data-section="diagnosis" role="tabpanel" tabindex="0">
       <h2>5. Diagnosis / Masalah Keperawatan &amp; Outcome</h2>
       <p class="desc">Hasil asesmen dirangkum menjadi masalah, tujuan, dan indikator terukur.</p>
       <div><label for="masalah">Masalah keperawatan</label><input id="masalah" placeholder="Mis. Risiko jatuh terkait immobilisasi"></div>
@@ -182,14 +182,14 @@
     </section>
 
     <!-- 6 -->
-    <section class="card" data-section="rencana" role="tabpanel" tabindex="0" hidden>
+    <section class="card" data-section="rencana" role="tabpanel" tabindex="0">
       <h2>6. Rencana Asuhan &amp; Intervensi</h2>
       <p class="desc">Diambil dari menu Rencana Asuhan Keperawatan yang sekarang terpisah, digabung ke format ini.</p>
       <div><label for="intervensi">Intervensi</label><textarea id="intervensi" placeholder="Mis. Pasang pengaman tempat tidur, observasi tiap 2 jam…"></textarea></div>
     </section>
 
     <!-- 7 -->
-    <section class="card" data-section="evaluasi" role="tabpanel" tabindex="0" hidden>
+    <section class="card" data-section="evaluasi" role="tabpanel" tabindex="0">
       <h2>7. Implementasi &amp; Evaluasi</h2>
       <p class="desc">Siklus ADOP(I)E: evaluasi buruk membuka asesmen ulang berupa entri baru.</p>
       <div><label for="implementasi">Implementasi</label><textarea id="implementasi" placeholder="Tindakan yang sudah dilakukan…"></textarea></div>
@@ -198,7 +198,7 @@
     </section>
 
     <!-- 8 -->
-    <section class="card" data-section="linimasa" role="tabpanel" tabindex="0" hidden>
+    <section class="card" data-section="linimasa" role="tabpanel" tabindex="0">
       <h2>8. Linimasa / Riwayat Lengkap</h2>
       <p class="desc">Satu urutan kronologis seluruh entri; sumber untuk Resume Rawat Inap.</p>
       <ol class="timeline" id="timeline">
@@ -210,6 +210,8 @@
         <li><time>26/11/2026 15:00</time><strong>Pemantauan Jatuh</strong> — skor 25</li>
       </ol>
     </section>
+  <div class="card" style="margin-top:14px"><div class="actions"><button class="btn primary" type="submit">Simpan Format Asesmen</button><button class="btn" type="button" onclick="window.print()">Cetak / Simpan PDF</button></div><p class="desc" style="margin-top:8px">Satu tombol submit untuk seluruh format. Status tersimpan tampil di bilah atas.</p></div>
+  </form>
   </main>
 </div>
 
@@ -223,25 +225,10 @@
   const nav = document.getElementById('nav');
   const panels = [...document.querySelectorAll('[data-section]')];
   parts.forEach(([id,label])=>{
-    const b=document.createElement('button'); b.type='button'; b.textContent=label;
-    b.setAttribute('role','tab'); b.setAttribute('aria-selected','false'); b.dataset.target=id;
-    b.addEventListener('click',()=>activate(id)); nav.appendChild(b);
+    const a=document.createElement('a'); a.href='#'+id; a.textContent=label;
+    a.className='block rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5';
+    nav.appendChild(a);
   });
-  const tabs=[...nav.querySelectorAll('button')];
-  function activate(id){
-    tabs.forEach(t=>t.setAttribute('aria-selected', String(t.dataset.target===id)));
-    panels.forEach(p=>p.hidden = p.dataset.section!==id);
-    if(location.hash.slice(1)!==id) history.replaceState(null,'','#'+id);
-    panels.find(p=>p.dataset.section===id)?.focus({preventScroll:true});
-  }
-  tabs.forEach((t,i)=>t.addEventListener('keydown',e=>{
-    if(!['ArrowDown','ArrowUp','ArrowRight','ArrowLeft'].includes(e.key))return;
-    e.preventDefault();
-    const d=(e.key==='ArrowDown'||e.key==='ArrowRight')?1:-1;
-    const n=(i+d+tabs.length)%tabs.length; tabs[n].focus(); activate(tabs[n].dataset.target);
-  }));
-  window.addEventListener('hashchange',()=>activate(location.hash.slice(1)||'identitas'));
-  activate(location.hash.slice(1)||'identitas');
 
   // ---------- dynamic list helper ----------
   // Render N input rows with a "+ Tambah baris" button. Each row is a labeled
@@ -514,6 +501,21 @@
   const state={text:'Tersimpan'};
   const statusEl=document.getElementById('saveState');
   function saved(){ statusEl.textContent='Tersimpan'; }
+  // Skrining: beberapa baris (bukan satu)
+  const skrRows = document.getElementById('skrRows');
+  function addSkrRow() {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td><select class="skr-nyeri"><option>Tidak nyeri</option><option>Nyeri ringan</option><option>Nyeri sedang</option><option>Nyeri berat</option></select></td>'
+      + '<td><input type="number" class="num skr-jatuh" inputmode="numeric" placeholder="Skor"></td>'
+      + '<td><input type="number" class="num skr-gizi" inputmode="numeric" placeholder="Skor"></td>'
+      + '<td><input type="number" class="num skr-ews" inputmode="numeric" placeholder="Skor"></td>'
+      + '<td><button type="button" class="btn" data-del>&times;</button></td>';
+    tr.querySelector('[data-del]').addEventListener('click', () => tr.remove());
+    skrRows.appendChild(tr);
+  }
+  document.getElementById('addSkr').addEventListener('click', addSkrRow);
+  addSkrRow();
+
   document.getElementById('addObs').addEventListener('click',()=>{
     const tr=document.createElement('tr');
     const t=document.getElementById('waktuObs').value.replace('T',' ');
