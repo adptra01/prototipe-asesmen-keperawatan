@@ -6,60 +6,76 @@
 <meta name="theme-color" content="#0f766e">
 <title>Prototype — Format Asesmen &amp; Observasi Keperawatan Rawat Inap</title>
 <style>
-  :root{ --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#f8fafc; --card:#fff;
-         --brand:#0f766e; --brand-soft:#ccfbf1; --warn:#b45309; --dot:#14b8a6; }
+  :root{ --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#f1f5f9; --card:#fff;
+         --brand:#0f766e; --brand-soft:#ccfbf1; --brand-ink:#115e59; --warn:#b45309; --dot:#14b8a6;
+         --radius:14px; }
   *{box-sizing:border-box}
-  body{margin:0;font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+  html{scroll-behavior:smooth}
+  body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
   a{color:var(--brand)}
   :focus-visible{outline:3px solid #5eead4;outline-offset:2px}
   .skip{position:absolute;left:-9999px}
-  .skip:focus{left:8px;top:8px;background:#fff;padding:8px;z-index:99}
-  header{background:var(--brand);color:#fff;padding:14px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
-  header h1{font-size:17px;margin:0}
-  header .meta{font-size:12px;opacity:.9}
-  .btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;font:inherit;cursor:pointer;color:var(--ink)}
-  .btn:hover{background:#f1f5f9}
+  .skip:focus{left:8px;top:8px;background:#fff;padding:8px;z-index:99;border-radius:8px}
+  header{background:var(--brand);color:#fff;padding:16px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+  header h1{font-size:18px;font-weight:650;letter-spacing:-.01em;margin:0;text-wrap:balance}
+  header .meta{font-size:12px;opacity:.85;margin-top:3px}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 14px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink);
+       transition:background-color .15s ease,border-color .15s ease,transform .15s ease}
+  .btn:hover{background:#f1f5f9;border-color:#cbd5e1}
+  .btn:active{transform:translateY(1px)}
   .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .btn.primary:hover{background:var(--brand-ink);border-color:var(--brand-ink)}
   .btn[disabled]{opacity:.55;cursor:not-allowed}
-  .wrap{display:grid;grid-template-columns:210px minmax(0,1fr);gap:18px;padding:18px;max-width:1400px;margin:auto}
-  nav[aria-label="Bagian format"]{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;position:sticky;top:18px;align-self:start}
-  nav h2{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:6px 8px}
-  nav button{display:block;width:100%;text-align:start;border:0;background:transparent;border-radius:8px;padding:9px 10px;font:inherit;cursor:pointer;color:var(--ink)}
-  nav button:hover{background:#f1f5f9}
-  nav button[aria-selected="true"]{background:var(--brand-soft);color:#115e59;font-weight:600}
+  .wrap{display:grid;grid-template-columns:224px minmax(0,1fr);gap:24px;padding:24px;max-width:1320px;margin:auto}
+  nav[aria-label="Bagian format"]{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;
+       position:sticky;top:24px;align-self:start;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+  nav h2{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:4px 8px 10px;font-weight:700}
+  nav a{display:flex;gap:9px;align-items:baseline;padding:9px 10px;border-radius:9px;color:var(--ink);
+        text-decoration:none;font-size:13px;line-height:1.35;transition:background-color .15s ease}
+  nav a:hover{background:#f1f5f9}
+  nav a[aria-current="location"]{background:var(--brand-soft);color:var(--brand-ink);font-weight:650}
+  nav a .n{font-variant-numeric:tabular-nums;color:var(--muted);font-size:11px;flex:0 0 18px}
   main{min-width:0}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
-  .card h2{font-size:16px;margin:0 0 4px}
-  .card h3{font-size:13px;margin:18px 0 8px;color:#115e59}
-  .desc{color:var(--muted);font-size:12px;margin:0 0 12px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-  label{display:block;font-size:12px;font-weight:600;margin-bottom:4px}
-  input,select,textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;background:#fff;color:var(--ink)}
-  textarea{min-height:64px;resize:vertical}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;margin-bottom:20px;
+        box-shadow:0 1px 3px rgba(15,23,42,.05);scroll-margin-top:24px}
+  .card h2{font-size:17px;font-weight:650;letter-spacing:-.01em;margin:0 0 6px;text-wrap:balance}
+  .card h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--brand-ink);
+           margin:24px 0 14px;padding-top:16px;border-top:1px solid var(--line)}
+  .desc{color:var(--muted);font-size:12.5px;margin:0 0 18px;max-width:76ch}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px 18px}
+  label{display:block;font-size:12px;font-weight:600;color:#334155;margin-bottom:6px}
+  input,select,textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font:inherit;
+        background:#fff;color:var(--ink);transition:border-color .15s ease}
+  input:hover,select:hover,textarea:hover{border-color:#cbd5e1}
+  input:focus-visible,select:focus-visible,textarea:focus-visible{border-color:var(--brand)}
+  textarea{min-height:78px;resize:vertical;line-height:1.5}
   .num{text-align:end;font-variant-numeric:tabular-nums}
-  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  .pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;background:#e2e8f0}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .pill{display:inline-block;border-radius:999px;padding:3px 10px;font-size:11px;background:#e2e8f0}
   .pill.ok{background:#d1fae5;color:#065f46}
   .pill.amend{background:#fef3c7;color:#92400e}
   table{border-collapse:collapse;width:100%;font-size:13px}
-  th,td{border-bottom:1px solid var(--line);padding:8px;text-align:start;vertical-align:top}
-  th{color:var(--muted);font-weight:600;font-size:12px}
+  th,td{border-bottom:1px solid var(--line);padding:10px 12px;text-align:start;vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
   td.num,th.num{text-align:end;font-variant-numeric:tabular-nums}
-  .note{background:#f0fdfa;border:1px solid #99f6e4;border-radius:8px;padding:10px;font-size:12px;color:#115e59}
-  .timeline{border-inline-start:2px solid var(--brand);padding-inline-start:14px;margin:0}
-  .timeline li{margin-bottom:12px;list-style:none;position:relative}
-  .timeline li::before{content:"";position:absolute;inset-inline-start:-19px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--dot)}
+  .note{background:#f0fdfa;border:1px solid #99f6e4;border-radius:9px;padding:12px 14px;font-size:12.5px;color:var(--brand-ink);line-height:1.5}
+  .timeline{border-inline-start:2px solid var(--brand);padding-inline-start:18px;margin:0}
+  .timeline li{margin-bottom:14px;list-style:none;position:relative}
+  .timeline li::before{content:"";position:absolute;inset-inline-start:-23px;top:6px;width:9px;height:9px;border-radius:50%;background:var(--dot)}
   .timeline time{font-size:11px;color:var(--muted);display:block}
   [hidden]{display:none !important}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-  .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
-  .dyn-rows{display:grid;gap:6px;margin-bottom:6px}
-  .dyn-row{display:flex;gap:8px;align-items:center}
-  .dyn-row input,.dyn-row select,.dyn-row textarea{flex:1}
+  .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+  .dyn-rows{display:grid;gap:8px;margin-bottom:8px}
+  .dyn-row{display:flex;gap:8px;align-items:flex-end}
+  .dyn-row input,.dyn-row select,.dyn-row textarea{min-width:0}
+  .dyn-row>div{min-width:0;flex:1}
+  .dyn-row>.btn{flex:0 0 auto}
   .dyn-container label{display:block;margin-bottom:4px}
-  @media (max-width:820px){ .wrap{grid-template-columns:1fr} nav[aria-label="Bagian format"]{position:static} }
-  @media (prefers-reduced-motion:reduce){ *{scroll-behavior:auto !important;transition:none !important} }
-  @media print{ header,nav,.actions,.skip{display:none} .wrap{display:block;padding:0} .card{break-inside:avoid;border:0} }
+  @media (max-width:820px){ .wrap{grid-template-columns:1fr;padding:16px} nav[aria-label="Bagian format"]{position:static}
+     .card{padding:18px 16px} header{padding:14px 16px} }
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} *{transition:none !important} }
+  @media print{ header,nav,.actions,.skip{display:none} .wrap{display:block;padding:0} .card{break-inside:avoid;border:0;box-shadow:none;margin-bottom:10px} }
 </style>
 </head>
 <body>
@@ -76,23 +92,23 @@
 <div class="wrap">
   <nav aria-label="Bagian format">
     <h2>Bagian format</h2>
-    <div role="tablist" aria-orientation="vertical" id="nav"></div>
+    <div id="nav"></div>
     <p class="desc" style="margin:12px 8px">Bagian 2–7 memakai field bersama yang sama; tidak diulang.</p>
   </nav>
 
   <main id="main">
 <form id="asesmenForm" novalidate>
     <!-- 1 -->
-    <section class="card" data-section="identitas" role="tabpanel" tabindex="0">
+    <section class="card" data-section="identitas">
       <h2>1. Identitas &amp; Konteks Kunjungan</h2>
       <p class="desc">Satu pasien rawat inap = satu format. Episode kunjungan dan mutasi tercatat di sini.</p>
       <div class="grid">
-        <div><label for="nama">Nama pasien</label><input id="nama" value="Pasien Contoh"></div>
-        <div><label for="rm">No. RM</label><input id="rm" value="00000000"></div>
-        <div><label for="reg">No. Registrasi</label><input id="reg" value="220000"></div>
-        <div><label for="unit">Unit / ruang saat ini</label><input id="unit" value="ICU"></div>
-        <div><label for="masuk">Waktu masuk</label><input id="masuk" type="datetime-local" value="2026-11-26T12:00"></div>
-        <div><label for="dpjp">DPJP</label><input id="dpjp" value="dr. Contoh"></div>
+        <div><label for="nama">Nama pasien</label><input id="nama" value="Pasien Contoh" name="nama" autocomplete="off"></div>
+        <div><label for="rm">No. RM</label><input id="rm" value="00000000" name="rm" autocomplete="off"></div>
+        <div><label for="reg">No. Registrasi</label><input id="reg" value="220000" name="reg" autocomplete="off"></div>
+        <div><label for="unit">Unit / ruang saat ini</label><input id="unit" value="ICU" name="unit" autocomplete="off"></div>
+        <div><label for="masuk">Waktu masuk</label><input id="masuk" type="datetime-local" value="2026-11-26T12:00" name="masuk"></div>
+        <div><label for="dpjp">DPJP</label><input id="dpjp" value="dr. Contoh" name="dpjp" autocomplete="off"></div>
       </div>
       <h3>Riwayat mutasi</h3>
       <table><thead><tr><th>Unit asal</th><th>Unit tujuan</th><th>Waktu</th></tr></thead>
@@ -100,35 +116,35 @@
     </section>
 
     <!-- 2 -->
-    <section class="card" data-section="asesmen" role="tabpanel" tabindex="0">
+    <section class="card" data-section="asesmen">
       <h2>2. Asesmen Awal</h2>
       <p class="desc">Pilih jenis asesmen. Field bersama muncul sekali; field khusus muncul sesuai jenis. Boleh lebih dari satu entri saat mutasi.</p>
       <div class="grid">
         <div><label for="jenis">Jenis asesmen</label>
-          <select id="jenis"><option>RI (Umum)</option><option selected>ICU</option><option>Anak</option><option>Obgyn</option><option>Syaraf</option><option>Neonatus</option><option>IGD / Pra-bedah</option></select></div>
-        <div><label for="waktu_asesmen">Waktu asesmen</label><input id="waktu_asesmen" type="datetime-local" value="2026-11-26T14:25"></div>
+          <select id="jenis" name="jenis" autocomplete="off"><option>RI (Umum)</option><option selected>ICU</option><option>Anak</option><option>Obgyn</option><option>Syaraf</option><option>Neonatus</option><option>IGD / Pra-bedah</option></select></div>
+        <div><label for="waktu_asesmen">Waktu asesmen</label><input id="waktu_asesmen" type="datetime-local" value="2026-11-26T14:25" name="waktu_asesmen"></div>
       </div>
       <h3>Field bersama — sesuai <code>asesmen-awal-keperawatan</code> MORBIS</h3>
       <div class="grid">
-        <div><label for="sumber_data">Sumber data</label><select id="sumber_data"><option>Pasien sendiri</option><option>Keluarga</option><option>Lainnya</option></select></div>
-        <div><label for="keluhan">Keluhan utama</label><input id="keluhan" placeholder="Isi keluhan utama…"></div>
-        <div><label for="sistol">TD sistol (mmHg)</label><input id="sistol" class="num" inputmode="numeric" placeholder="120"></div>
-        <div><label for="diastol">TD diastol (mmHg)</label><input id="diastol" class="num" inputmode="numeric" placeholder="80"></div>
-        <div><label for="nadi">Nadi (/menit)</label><input id="nadi" class="num" inputmode="numeric" placeholder="80"></div>
-        <div><label for="pernafasan">Pernafasan (/menit)</label><input id="pernafasan" class="num" inputmode="numeric" placeholder="20"></div>
-        <div><label for="suhu">Suhu (°C)</label><input id="suhu" class="num" placeholder="36,5"></div>
-        <div><label for="bb">BB (kg)</label><input id="bb" class="num" placeholder="60"></div>
-        <div><label for="tb">TB (cm)</label><input id="tb" class="num" placeholder="165"></div>
-        <div><label for="kesadaran">Kesadaran</label><select id="kesadaran"><option>Compos mentis</option><option>Somnolent</option><option>Stupor</option><option>Coma</option></select></div>
+        <div><label for="sumber_data">Sumber data</label><select id="sumber_data" name="sumber_data" autocomplete="off"><option>Pasien sendiri</option><option>Keluarga</option><option>Lainnya</option></select></div>
+        <div><label for="keluhan">Keluhan utama</label><input id="keluhan" placeholder="Isi keluhan utama…" name="keluhan" autocomplete="off"></div>
+        <div><label for="sistol">TD sistol (mmHg)</label><input id="sistol" class="num" inputmode="numeric" placeholder="120" name="sistol" autocomplete="off"></div>
+        <div><label for="diastol">TD diastol (mmHg)</label><input id="diastol" class="num" inputmode="numeric" placeholder="80" name="diastol" autocomplete="off"></div>
+        <div><label for="nadi">Nadi (/menit)</label><input id="nadi" class="num" inputmode="numeric" placeholder="80" name="nadi" autocomplete="off"></div>
+        <div><label for="pernafasan">Pernafasan (/menit)</label><input id="pernafasan" class="num" inputmode="numeric" placeholder="20" name="pernafasan" autocomplete="off"></div>
+        <div><label for="suhu">Suhu (°C)</label><input id="suhu" class="num" placeholder="36,5" name="suhu" autocomplete="off"></div>
+        <div><label for="bb">BB (kg)</label><input id="bb" class="num" placeholder="60" name="bb" autocomplete="off"></div>
+        <div><label for="tb">TB (cm)</label><input id="tb" class="num" placeholder="165" name="tb" autocomplete="off"></div>
+        <div><label for="kesadaran">Kesadaran</label><select id="kesadaran" name="kesadaran" autocomplete="off"><option>Compos mentis</option><option>Somnolent</option><option>Stupor</option><option>Coma</option></select></div>
       </div>
       <h3>Skrining bawaan (sudah ada di form awal — read-only di observasi)</h3>
       <div class="grid">
-        <div><label for="scrining_nyeri">Skrining nyeri</label><select id="scrining_nyeri"><option>Tidak ada</option><option>Nyeri kronis</option><option>Nyeri akut</option></select></div>
-        <div><label for="pews">PEWS</label><input id="pews" class="num" inputmode="numeric"></div>
-        <div><label for="news">NEWS</label><input id="news" class="num" inputmode="numeric"></div>
-        <div><label for="meows">MEOWS</label><input id="meows" class="num" inputmode="numeric"></div>
-        <div><label for="gumpty">Humpty Dumpty</label><input id="gumpty" class="num" inputmode="numeric"></div>
-        <div><label for="morse">Morse</label><input id="morse" class="num" inputmode="numeric"></div>
+        <div><label for="scrining_nyeri">Skrining nyeri</label><select id="scrining_nyeri" name="scrining_nyeri" autocomplete="off"><option>Tidak ada</option><option>Nyeri kronis</option><option>Nyeri akut</option></select></div>
+        <div><label for="pews">PEWS</label><input id="pews" class="num" inputmode="numeric" name="pews" autocomplete="off"></div>
+        <div><label for="news">NEWS</label><input id="news" class="num" inputmode="numeric" name="news" autocomplete="off"></div>
+        <div><label for="meows">MEOWS</label><input id="meows" class="num" inputmode="numeric" name="meows" autocomplete="off"></div>
+        <div><label for="gumpty">Humpty Dumpty</label><input id="gumpty" class="num" inputmode="numeric" name="gumpty" autocomplete="off"></div>
+        <div><label for="morse">Morse</label><input id="morse" class="num" inputmode="numeric" name="morse" autocomplete="off"></div>
       </div>
       <h3 id="jenisTitle">Field khusus ICU</h3>
       <div class="grid" id="jenisFields" aria-labelledby="jenisTitle"></div>
@@ -136,7 +152,7 @@
     </section>
 
     <!-- 3 -->
-    <section class="card" data-section="skrining" role="tabpanel" tabindex="0">
+    <section class="card" data-section="skrining">
       <h2>3. Skrining Terstandar (bisa lebih dari satu baris)</h2>
       <p class="desc">Diisi sekali di awal; di bagian observasi nilai ini tampil read-only agar tidak diinput ulang. Gunakan "+ Tambah baris skrining" bila ada skrining berulang.</p>
       <div class="dyn-container">
@@ -147,17 +163,17 @@
     </section>
 
     <!-- 4 -->
-    <section class="card" data-section="observasi" role="tabpanel" tabindex="0">
+    <section class="card" data-section="observasi">
       <h2>4. Observasi &amp; Pengukuran Berulang</h2>
       <p class="desc">EWS, Jatuh, dan Nyeri. Setiap simpan membuat entri baru lengkap dengan waktu, unit, petugas, dan status.</p>
       <div class="grid">
-        <div><label for="jenisObs">Jenis observasi</label><select id="jenisObs"><option value="EWS">EWS</option><option value="MEOWS">MEOWS (ibu hamil)</option><option value="PWS">PWS (bayi/anak)</option><option value="Jatuh">Pemantauan Jatuh</option><option value="Nyeri">Pengkajian Ulang Nyeri</option></select></div>
-        <div><label for="waktuObs">Waktu</label><input id="waktuObs" type="datetime-local" value="2026-11-26T15:00"></div>
-        <div><label for="petugas">Petugas</label><input id="petugas" value="Perawat Contoh"></div>
+        <div><label for="jenisObs">Jenis observasi</label><select id="jenisObs" name="jenisObs" autocomplete="off"><option value="EWS">EWS</option><option value="MEOWS">MEOWS (ibu hamil)</option><option value="PWS">PWS (bayi/anak)</option><option value="Jatuh">Pemantauan Jatuh</option><option value="Nyeri">Pengkajian Ulang Nyeri</option></select></div>
+        <div><label for="waktuObs">Waktu</label><input id="waktuObs" type="datetime-local" value="2026-11-26T15:00" name="waktuObs"></div>
+        <div><label for="petugas">Petugas</label><input id="petugas" value="Perawat Contoh" name="petugas" autocomplete="off"></div>
       </div>
       <h3 id="obsTitle">Field EWS — sesuai <code>ews/form</code> MORBIS</h3>
       <div class="grid" id="obsFields" aria-labelledby="obsTitle"></div>
-      <div style="margin-top:10px"><label for="catatanObs">Catatan observasi</label><textarea id="catatanObs" placeholder="Tulis hasil observasi…"></textarea></div>
+      <div style="margin-top:10px"><label for="catatanObs">Catatan observasi</label><textarea id="catatanObs" placeholder="Tulis hasil observasi…" name="catatanObs" autocomplete="off"></textarea></div>
       <div class="actions"><button class="btn primary" type="button" id="addObs">Tambah entri observasi</button></div>
       <h3>Riwayat entri observasi</h3>
       <table>
@@ -171,31 +187,31 @@
     </section>
 
     <!-- 5 -->
-    <section class="card" data-section="diagnosis" role="tabpanel" tabindex="0">
+    <section class="card" data-section="diagnosis">
       <h2>5. Diagnosis / Masalah Keperawatan &amp; Outcome</h2>
       <p class="desc">Hasil asesmen dirangkum menjadi masalah, tujuan, dan indikator terukur.</p>
-      <div><label for="masalah">Masalah keperawatan</label><input id="masalah" placeholder="Mis. Risiko jatuh terkait immobilisasi"></div>
-      <div style="margin-top:10px"><label for="outcome">Outcome / tujuan</label><textarea id="outcome" placeholder="Mis. Pasien tidak mengalami jatuh selama perawatan"></textarea></div>
+      <div><label for="masalah">Masalah keperawatan</label><input id="masalah" placeholder="Mis. Risiko jatuh terkait immobilisasi" name="masalah" autocomplete="off"></div>
+      <div style="margin-top:10px"><label for="outcome">Outcome / tujuan</label><textarea id="outcome" placeholder="Mis. Pasien tidak mengalami jatuh selama perawatan" name="outcome" autocomplete="off"></textarea></div>
     </section>
 
     <!-- 6 -->
-    <section class="card" data-section="rencana" role="tabpanel" tabindex="0">
+    <section class="card" data-section="rencana">
       <h2>6. Rencana Asuhan &amp; Intervensi</h2>
       <p class="desc">Diambil dari menu Rencana Asuhan Keperawatan yang sekarang terpisah, digabung ke format ini.</p>
-      <div><label for="intervensi">Intervensi</label><textarea id="intervensi" placeholder="Mis. Pasang pengaman tempat tidur, observasi tiap 2 jam…"></textarea></div>
+      <div><label for="intervensi">Intervensi</label><textarea id="intervensi" placeholder="Mis. Pasang pengaman tempat tidur, observasi tiap 2 jam…" name="intervensi" autocomplete="off"></textarea></div>
     </section>
 
     <!-- 7 -->
-    <section class="card" data-section="evaluasi" role="tabpanel" tabindex="0">
+    <section class="card" data-section="evaluasi">
       <h2>7. Implementasi &amp; Evaluasi</h2>
       <p class="desc">Siklus ADOP(I)E: evaluasi buruk membuka asesmen ulang berupa entri baru.</p>
-      <div><label for="implementasi">Implementasi</label><textarea id="implementasi" placeholder="Tindakan yang sudah dilakukan…"></textarea></div>
-      <div style="margin-top:10px"><label for="evaluasi">Evaluasi</label><textarea id="evaluasi" placeholder="Apakah outcome tercapai?"></textarea></div>
+      <div><label for="implementasi">Implementasi</label><textarea id="implementasi" placeholder="Tindakan yang sudah dilakukan…" name="implementasi" autocomplete="off"></textarea></div>
+      <div style="margin-top:10px"><label for="evaluasi">Evaluasi</label><textarea id="evaluasi" placeholder="Apakah outcome tercapai?" name="evaluasi" autocomplete="off"></textarea></div>
       <div class="actions"><a class="btn" href="#asesmen">Buka asesmen ulang →</a></div>
     </section>
 
     <!-- 8 -->
-    <section class="card" data-section="linimasa" role="tabpanel" tabindex="0">
+    <section class="card" data-section="linimasa">
       <h2>8. Linimasa / Riwayat Lengkap</h2>
       <p class="desc">Satu urutan kronologis seluruh entri; sumber untuk Resume Rawat Inap.</p>
       <ol class="timeline" id="timeline">
@@ -221,11 +237,20 @@
   ];
   const nav = document.getElementById('nav');
   const panels = [...document.querySelectorAll('[data-section]')];
-  parts.forEach(([id,label])=>{
-    const a=document.createElement('a'); a.href='#'+id; a.textContent=label;
-    a.className='block rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5';
-    nav.appendChild(a);
+  parts.forEach(([id,label],i)=>{
+    const a=document.createElement('a'); a.href='#'+id;
+    const n=document.createElement('span'); n.className='n'; n.textContent=String(i+1).padStart(2,'0');
+    const t=document.createElement('span'); t.textContent=label.replace(/^\d+\.\s*/,'');
+    a.append(n,t); a.dataset.target=id; nav.appendChild(a);
   });
+  function markActive(){
+    const cur=location.hash.slice(1)||'identitas';
+    nav.querySelectorAll('a').forEach(a=>{
+      if(a.dataset.target===cur) a.setAttribute('aria-current','location');
+      else a.removeAttribute('aria-current');
+    });
+  }
+  window.addEventListener('hashchange',markActive); markActive();
 
   // ---------- dynamic list helper ----------
   // Render N input rows with a "+ Tambah baris" button. Each row is a labeled
@@ -506,7 +531,7 @@
       + '<td><input type="number" class="num skr-jatuh" inputmode="numeric" placeholder="Skor"></td>'
       + '<td><input type="number" class="num skr-gizi" inputmode="numeric" placeholder="Skor"></td>'
       + '<td><input type="number" class="num skr-ews" inputmode="numeric" placeholder="Skor"></td>'
-      + '<td><button type="button" class="btn" data-del>&times;</button></td>';
+      + '<td><button type="button" class="btn" data-del aria-label="Hapus baris skrining">&times;</button></td>';
     tr.querySelector('[data-del]').addEventListener('click', () => tr.remove());
     skrRows.appendChild(tr);
   }
