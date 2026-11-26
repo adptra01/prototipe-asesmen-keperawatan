@@ -53,6 +53,10 @@
   [hidden]{display:none !important}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
   .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+  .dyn-rows{display:grid;gap:6px;margin-bottom:6px}
+  .dyn-row{display:flex;gap:8px;align-items:center}
+  .dyn-row input,.dyn-row select,.dyn-row textarea{flex:1}
+  .dyn-container label{display:block;margin-bottom:4px}
   @media (max-width:820px){ .wrap{grid-template-columns:1fr} nav[aria-label="Bagian format"]{position:static} }
   @media (prefers-reduced-motion:reduce){ *{scroll-behavior:auto !important;transition:none !important} }
   @media print{ header,nav,.actions,.skip{display:none} .wrap{display:block;padding:0} .card{break-inside:avoid;border:0} }
@@ -237,8 +241,61 @@
   window.addEventListener('hashchange',()=>activate(location.hash.slice(1)||'identitas'));
   activate(location.hash.slice(1)||'identitas');
 
-  // Setiap jenis asesmen punya field berbeda — dirender dari data, bukan hardcode per cabang.
-  // Field diambil dari FORM TAMBAH asli MORBIS (bukan rekaan).
+  // ---------- dynamic list helper ----------
+  // Render N input rows with a "+ Tambah baris" button. Each row is a labeled
+  // input/select. Used for MORBIS array fields (faktor_resiko0..16, kriteria0..,
+  // gejala_tanda_minorobjektif0..6, nilai[0..8], paramter[], nama_diagnosa[]).
+  function makeDynamicList(container, namePrefix, count, makeRow) {
+    container.innerHTML = '';
+    const rowsWrap = document.createElement('div');
+    rowsWrap.className = 'dyn-rows';
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'btn';
+    addBtn.textContent = '+ Tambah baris';
+    addBtn.addEventListener('click', () => addRow(rowsWrap, namePrefix, makeRow, rowsWrap.children.length));
+    container.appendChild(rowsWrap);
+    container.appendChild(addBtn);
+    for (let i = 0; i < count; i++) addRow(rowsWrap, namePrefix, makeRow, i);
+  }
+  function addRow(rowsWrap, namePrefix, makeRow, idx) {
+    const row = document.createElement('div');
+    row.className = 'dyn-row';
+    row.style.display = 'flex';
+    row.style.gap = '8px';
+    row.style.alignItems = 'center';
+    row.style.marginBottom = '6px';
+    const field = makeRow(idx);
+    row.appendChild(field);
+    const rm = document.createElement('button');
+    rm.type = 'button';
+    rm.className = 'btn';
+    rm.textContent = '×';
+    rm.setAttribute('aria-label', 'Hapus baris');
+    rm.addEventListener('click', () => { row.remove(); renumber(rowsWrap, namePrefix); });
+    row.appendChild(rm);
+    rowsWrap.appendChild(row);
+  }
+  function renumber(rowsWrap, namePrefix) {
+    [...rowsWrap.children].forEach((row, i) => {
+      const inp = row.querySelector('input,select,textarea');
+      if (inp) inp.name = namePrefix + i;
+    });
+  }
+
+  function labeledInput(id, name, label, type, placeholder) {
+    const w = document.createElement('div');
+    w.style.flex = '1';
+    const l = document.createElement('label'); l.htmlFor = id; l.textContent = label; l.style.fontSize = '12px';
+    const el = document.createElement('input');
+    el.id = id; el.name = name; el.type = type || 'text';
+    if (placeholder) el.placeholder = placeholder;
+    if (type === 'number') { el.className = 'num'; el.inputMode = 'numeric'; }
+    w.append(l, el);
+    return w;
+  }
+
+  // ---------- FIELD_SETS (asesmen awal) ----------
   const FIELD_SETS = {
     'RI (Umum)': [
       {k:'ananmesa',t:'textarea',l:'Anamnesa'},{k:'penyakit_terbaru',t:'text',l:'Riwayat penyakit dahulu'},
@@ -308,7 +365,11 @@
     ],
   };
   const CATATAN = {
-    'IGD / Pra-bedah':'Form "pengkajian-prabedah" hanya memuat identitas permintaan; triase ada di menu Triase Terintegrasi (IGD) yang perlu dikonfirmasi terpisah.',
+    'ICU':'Form ICU di MORBIS dibuka dari menu asesmen (asesmen-icu) — halaman menu, form dinamis dimuat di tempat. Field di atas adalah subset yang terverifikasi.',
+    'Anak':'Form anak (pengkajian-awal-ri/anak) memuat array dinamis (ada_hambatan[], cara_edukasi[], status_fungsional[]). Di prototype ini disederhanakan.',
+    'Obgyn':'Form obgyn memuat array dinamis (diagnosis_kus[], ginekologi_ya[], ya_ketergantungan[], ya_penyakit_keluarga[]). Disini disederhanakan.',
+    'Neonatus':'Form neonatus memuat array dinamis (cara_edukasi[], hambatan_edukasi[], major/minor_resiko_infeksi[], masalah_keperawatan[1][...]). Disini disederhanakan.',
+    'IGD / Pra-bedah':'Form IGD memuat banyak field dinamis (airway[], breathing[], circulation[], disability[], medis[obat][0..5], perawatigd[1..6], idicd[]). Disini disederhanakan.',
   };
   const jenis=document.getElementById('jenis');
   const fieldBox=document.getElementById('jenisFields');
@@ -331,36 +392,69 @@
       const p=document.createElement('p'); p.className='note'; p.style.gridColumn='1/-1'; p.textContent=CATATAN[key];
       fieldBox.appendChild(p);
     }
+    // dynamic diagnosis list (from tambah-asesmen MORBIS: nama_diagnosa[], idicd_diagnosa[])
+    if (key === 'RI (Umum)') {
+      const sec = document.createElement('div');
+      sec.style.gridColumn = '1/-1';
+      const h = document.createElement('h3'); h.textContent = 'Diagnosis ICD (dinamis — nama_diagnosa[] + idicd_diagnosa[])';
+      sec.appendChild(h);
+      const c = document.createElement('div'); c.id = 'dynDiag';
+      makeDynamicList(c, 'nama_diagnosa', 1, (i) => {
+        const row = document.createElement('div');
+        row.style.display='flex'; row.style.gap='8px'; row.style.flex='1';
+        const inp = document.createElement('input'); inp.type='text'; inp.name='nama_diagnosa'; inp.placeholder='Nama diagnosis…';
+        const code = document.createElement('input'); code.type='text'; code.name='idicd_diagnosa'; code.placeholder='Kode ICD…'; code.style.maxWidth='140px';
+        row.append(inp, code);
+        return row;
+      });
+      sec.appendChild(c);
+      fieldBox.appendChild(sec);
+    }
   }
   jenis.addEventListener('change',renderFields); renderFields();
 
-  // Field observasi juga berbeda tiap jenis — sesuai form asli MORBIS.
+  // ---------- OBSERVASI ----------
   const OBS_SETS = {
-    'EWS': {title:'EWS — ews/form', score:'f_obs_total_score', fields:[
-      {k:'pernafasan',t:'number',l:'Pernafasan'},{k:'saturasi_oksigen',t:'number',l:'Saturasi O2 (%)'},
-      {k:'oksigen',t:'select',l:'Oksigen',o:['Tidak','Ya']},{k:'tekanan_darah',t:'text',l:'Tekanan darah'},
-      {k:'nadi',t:'number',l:'Nadi'},{k:'kesadaran',t:'select',l:'Kesadaran',o:['Compos mentis','Somnolent','Stupor','Coma']},
-      {k:'temperatur',t:'number',l:'Temperatur'},{k:'urine',t:'text',l:'Urine'},
-      {k:'eskalasi',t:'text',l:'Eskalasi perawatan'},{k:'total_score',t:'number',l:'Total skor'},
+    'EWS': {title:'EWS — ews/form', score:'total_score', fields:[
+      {k:'pernafasan',t:'number',l:'Pernafasan', arr:true},
+      {k:'saturasi_oksigen',t:'number',l:'Saturasi O2 (%)', arr:true},
+      {k:'oksigen',t:'select',l:'Oksigen',o:['Tidak','Ya'], arr:true},
+      {k:'tekanan_darah',t:'text',l:'Tekanan darah', arr:true},
+      {k:'nadi',t:'number',l:'Nadi', arr:true},
+      {k:'kesadaran',t:'select',l:'Kesadaran',o:['Compos mentis','Somnolent','Stupor','Coma'], arr:true},
+      {k:'temperatur',t:'number',l:'Temperatur', arr:true},
+      {k:'urine',t:'text',l:'Urine'},
+      {k:'eskalasi',t:'text',l:'Eskalasi perawatan'},
+      {k:'total_score',t:'number',l:'Total skor'},
     ]},
-    'MEOWS': {title:'MEOWS — ews/form?jenis_pws=MEOWS', score:'f_obs_total_score', fields:[
+    'MEOWS': {title:'MEOWS — ews/form?jenis_pws=MEOWS', score:'total_score', fields:[
       {k:'pernafasan',t:'number',l:'Pernafasan'},{k:'saturasi_oksigen',t:'number',l:'Saturasi O2 (%)'},
       {k:'tekanan_darah',t:'text',l:'Tekanan darah'},{k:'nadi',t:'number',l:'Nadi'},
       {k:'temperatur',t:'number',l:'Temperatur'},{k:'total_score',t:'number',l:'Total skor'},
     ]},
-    'PWS': {title:'PWS — parameter observasi bayi/anak', score:'f_obs_total_score', fields:[
+    'PWS': {title:'PWS — parameter observasi bayi/anak', score:'total_score', fields:[
       {k:'pernafasan',t:'number',l:'Pernafasan'},{k:'oksigen',t:'select',l:'Oksigen',o:['Tidak','Ya']},
       {k:'nadi',t:'number',l:'Laju jantung'},{k:'kesadaran',t:'select',l:'Kesadaran',o:['Baik','Lemah','Tidak']},
       {k:'total_score',t:'number',l:'Total skor'},
     ]},
-    'Jatuh': {title:'Pemantauan Jatuh — resiko-jatuh/form', score:'f_obs_morse', fields:[
-      {k:'faktor_resiko',t:'select',l:'Faktor risiko',o:['Tidak ada','Riwayat jatuh','Usia >65','Alat bantu jalan']},
-      {k:'morse',t:'number',l:'Skor Morse'},{k:'observasi',t:'text',l:'Observasi'},
-      {k:'terapeutik',t:'text',l:'Terapeutik'},{k:'edukasi',t:'text',l:'Edukasi'},
+    'Jatuh': {title:'Pemantauan Jatuh — resiko-jatuh/form', score:'morse', fields:[
+      {k:'faktor_resiko',t:'dynamic',l:'Faktor risiko (faktor_resiko0..16)', count:17, prefix:'faktor_resiko'},
+      {k:'morse',t:'number',l:'Skor Morse'},{k:'observasi',t:'dynamic',l:'Observasi (Observasi0..4)', count:5, prefix:'Observasi'},
+      {k:'terapeutik',t:'dynamic',l:'Terapeutik (Terapeutik0..7)', count:8, prefix:'Terapeutik'},
+      {k:'edukasi',t:'dynamic',l:'Edukasi (Edukasi0..3)', count:4, prefix:'Edukasi'},
     ]},
-    'Nyeri': {title:'Pengkajian Ulang Nyeri — nyeri-akut/form', score:'f_obs_skala', fields:[
-      {k:'penyebab',t:'text',l:'Penyebab nyeri'},{k:'gejala',t:'text',l:'Gejala & tanda'},
-      {k:'skala',t:'number',l:'Skala nyeri'},{k:'intervensi',t:'text',l:'Intervensi'},
+    'Nyeri': {title:'Pengkajian Ulang Nyeri — nyeri-akut/form', score:'skala', fields:[
+      {k:'penyebab',t:'dynamic',l:'Penyebab (penyebab0..2)', count:3, prefix:'penyebab'},
+      {k:'gejala_mayor_subj',t:'dynamic',l:'Gejala & tanda mayor subjektif (1)', count:1, prefix:'gejala_tanda_mayorsubjektif'},
+      {k:'gejala_mayor_obj',t:'dynamic',l:'Gejala & tanda mayor objektif (0..4)', count:5, prefix:'gejala_tanda_mayorobjektif'},
+      {k:'gejala_minor_obj',t:'dynamic',l:'Gejala & tanda minor objektif (0..6)', count:7, prefix:'gejala_tanda_minorobjektif'},
+      {k:'skala',t:'number',l:'Skala nyeri'},
+      {k:'intervensi',t:'text',l:'Intervensi'},
+      {k:'kriteria',t:'dynamic',l:'Kriteria (kriteria0..26)', count:27, prefix:'kriteria'},
+      {k:'observasi',t:'dynamic',l:'Observasi (observasi0..5)', count:6, prefix:'observasi'},
+      {k:'terapeutik',t:'dynamic',l:'Terapeutik (terapeutik0..6)', count:7, prefix:'terapeutik'},
+      {k:'edukasi',t:'dynamic',l:'Edukasi (edukasi0..4)', count:5, prefix:'edukasi'},
+      {k:'kolaborasi',t:'dynamic',l:'Kolaborasi (kolaborasi0..1)', count:2, prefix:'kolaborasi'},
     ]},
   };
   const jenisObs=document.getElementById('jenisObs');
@@ -371,17 +465,50 @@
     obsBox.replaceChildren();
     set.fields.forEach(f=>{
       const wrap=document.createElement('div');
-      const id='f_obs_'+f.k;
-      const label=document.createElement('label'); label.htmlFor=id; label.textContent=f.l;
-      let el;
-      if(f.t==='select'){el=document.createElement('select');f.o.forEach(o=>{const op=document.createElement('option');op.textContent=o;el.appendChild(op);});}
-      else {el=document.createElement('input');el.type=f.t;if(f.t==='number'){el.className='num';el.inputMode='numeric';}else el.placeholder=f.l+'…';}
-      el.id=id; el.name=f.k; wrap.append(label,el); obsBox.appendChild(wrap);
+      if (f.t === 'dynamic') {
+        const label=document.createElement('label'); label.textContent=f.l;
+        const c=document.createElement('div'); c.className='dyn-container';
+        makeDynamicList(c, f.prefix, f.count, (i) => {
+          const inp=document.createElement('input'); inp.type='text'; inp.name=f.prefix+i; inp.placeholder=f.prefix+i+'…';
+          return inp;
+        });
+        wrap.append(label, c);
+      } else {
+        const id='f_obs_'+f.k;
+        const label=document.createElement('label'); label.htmlFor=id; label.textContent=f.l;
+        let el;
+        if(f.t==='select'){el=document.createElement('select');f.o.forEach(o=>{const op=document.createElement('option');op.textContent=o;el.appendChild(op);});}
+        else {el=document.createElement('input');el.type=f.t;if(f.t==='number'){el.className='num';el.inputMode='numeric';}else el.placeholder=f.l+'…';}
+        el.id=id; el.name=f.k;
+        // auto-score hook for EWS numeric fields
+        if (key==='EWS' && f.t==='number' && f.k!=='total_score') {
+          el.addEventListener('input', computeEws);
+        }
+        wrap.append(label,el);
+      }
+      obsBox.appendChild(wrap);
     });
+    if (key === 'EWS') {
+      const note = document.createElement('p'); note.className='note'; note.style.gridColumn='1/-1';
+      note.textContent = 'Skor total dihitung otomatis dari nilai_* (pernafasan, saturasi, oksigen, tekanan darah, nadi, kesadaran, temperatur).';
+      obsBox.appendChild(note);
+    }
+  }
+  function computeEws() {
+    const total = document.getElementById('f_obs_total_score');
+    if (!total) return;
+    // sum all numeric EWS inputs except total_score
+    let sum = 0;
+    obsBox.querySelectorAll('input[type="number"]').forEach(inp => {
+      if (inp.id === 'f_obs_total_score') return;
+      const v = parseFloat(inp.value);
+      if (!isNaN(v)) sum += v;
+    });
+    total.value = sum;
   }
   jenisObs.addEventListener('change',renderObs); renderObs();
 
-  // Entri observasi baru (append-only)
+  // ---------- entries ----------
   const state={text:'Tersimpan'};
   const statusEl=document.getElementById('saveState');
   function saved(){ statusEl.textContent='Tersimpan'; }
@@ -390,7 +517,7 @@
     const t=document.getElementById('waktuObs').value.replace('T',' ');
     const j=document.getElementById('jenisObs').value;
     const p=document.getElementById('petugas').value;
-    const s=document.getElementById(OBS_SETS[j].score)?.value||'0';
+    const s=document.getElementById('f_obs_total_score')?.value || document.getElementById('f_obs_morse')?.value || document.getElementById('f_obs_skala')?.value || '0';
     tr.innerHTML='<td>'+t+'</td><td>'+j+'</td><td>ICU</td><td>'+p+'</td><td class="num">'+s+'</td><td><span class="pill ok">final</span></td>';
     document.getElementById('obsRows').appendChild(tr);
     const li=document.createElement('li');
@@ -406,7 +533,10 @@
     statusEl.textContent='Asesmen baru ditambahkan'; setTimeout(saved,1500);
   });
   document.getElementById('printBtn').addEventListener('click',()=>window.print());
+
+  // reduced motion: disable transitions handled by CSS
 })();
 </script>
+
 </body>
 </html>
