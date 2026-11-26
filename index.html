@@ -102,6 +102,7 @@
     <section class="card" data-section="asesmen" role="tabpanel" tabindex="0" hidden>
       <h2>2. Asesmen Awal</h2>
       <p class="desc">Pilih jenis asesmen. Field bersama muncul sekali; field khusus muncul sesuai jenis. Boleh lebih dari satu entri saat mutasi.</p>
+      <form id="asesmenForm">
       <div class="grid">
         <div><label for="jenis">Jenis asesmen</label>
           <select id="jenis"><option>RI (Umum)</option><option selected>ICU</option><option>Anak</option><option>Obgyn</option><option>Syaraf</option><option>Neonatus</option><option>IGD / Pra-bedah</option></select></div>
@@ -132,7 +133,8 @@
       <h3 id="jenisTitle">Field khusus ICU</h3>
       <div class="grid" id="jenisFields" aria-labelledby="jenisTitle"></div>
       <div class="note" id="asesmenInfo">Entri baru akan dibuat. Asesmen RI lama (14:05) tetap tersimpan dengan status <strong>final</strong>.</div>
-      <div class="actions"><button class="btn primary" type="button" id="addAsesmen" aria-describedby="asesmenInfo">Tambah asesmen baru</button></div>
+      <div class="actions"><button class="btn primary" type="submit">Simpan Asesmen Awal</button></div>
+      </form>
     </section>
 
     <!-- 3 -->
@@ -526,11 +528,9 @@
     document.getElementById('catatanObs').value='';
     statusEl.textContent='Entri ditambahkan'; setTimeout(saved,1500);
   });
-  document.getElementById('addAsesmen').addEventListener('click',()=>{
-    const li=document.createElement('li');
-    li.innerHTML='<time>'+document.getElementById('waktu_asesmen').value.replace('T',' ')+'</time><strong>Asesmen Awal '+jenis.value+'</strong> — <span class="pill ok">final</span>';
-    document.getElementById('timeline').appendChild(li);
-    statusEl.textContent='Asesmen baru ditambahkan'; setTimeout(saved,1500);
+  document.getElementById('asesmenForm').addEventListener('submit',(e)=>{
+    e.preventDefault();
+    statusEl.textContent='Tersimpan';
   });
   document.getElementById('printBtn').addEventListener('click',()=>window.print());
 
