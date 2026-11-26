@@ -103,7 +103,6 @@
     <section class="card" data-section="asesmen" role="tabpanel" tabindex="0">
       <h2>2. Asesmen Awal</h2>
       <p class="desc">Pilih jenis asesmen. Field bersama muncul sekali; field khusus muncul sesuai jenis. Boleh lebih dari satu entri saat mutasi.</p>
-      <form id="asesmenForm">
       <div class="grid">
         <div><label for="jenis">Jenis asesmen</label>
           <select id="jenis"><option>RI (Umum)</option><option selected>ICU</option><option>Anak</option><option>Obgyn</option><option>Syaraf</option><option>Neonatus</option><option>IGD / Pra-bedah</option></select></div>
@@ -134,8 +133,6 @@
       <h3 id="jenisTitle">Field khusus ICU</h3>
       <div class="grid" id="jenisFields" aria-labelledby="jenisTitle"></div>
       <div class="note" id="asesmenInfo">Entri baru akan dibuat. Asesmen RI lama (14:05) tetap tersimpan dengan status <strong>final</strong>.</div>
-      <div class="actions"><button class="btn primary" type="submit">Simpan Asesmen Awal</button></div>
-      </form>
     </section>
 
     <!-- 3 -->
@@ -210,7 +207,7 @@
         <li><time>26/11/2026 15:00</time><strong>Pemantauan Jatuh</strong> — skor 25</li>
       </ol>
     </section>
-  <div class="card" style="margin-top:14px"><div class="actions"><button class="btn primary" type="submit">Simpan Format Asesmen</button><button class="btn" type="button" onclick="window.print()">Cetak / Simpan PDF</button></div><p class="desc" style="margin-top:8px">Satu tombol submit untuk seluruh format. Status tersimpan tampil di bilah atas.</p></div>
+  <div class="card" style="margin-top:14px"><div class="actions"><button class="btn primary" type="submit">Submit</button></div><p class="desc" style="margin-top:8px">Satu tombol submit untuk seluruh format. Status tersimpan tampil di bilah atas.</p></div>
   </form>
   </main>
 </div>
